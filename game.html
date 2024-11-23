@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Escape Room Game</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- Link causes overexposure issues -->
+    <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+    <script>
+        key1Found = false;
+        key2Found = false;
+        key3Found = false;
+
+        AFRAME.registerComponent('timer', {
+            init: function () {
+                var timerText = this.el;
+                var initialTime = 15 * 60; // 5 minutes in seconds
+                var timerRunning = false;
+                var interval;
+
+                var camera = document.querySelector('[camera]');
+                camera.removeAttribute('look-controls');
+                camera.removeAttribute('wasd-controls');
+
+                function updateTimer() {
+                    var minutes = Math.floor(initialTime / 60);
+                    var seconds = initialTime % 60;
+                    var formattedTime = ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+                    timerText.setAttribute('text', 'value', formattedTime);
+
+                    if (initialTime > 0) {
+                        initialTime--;
+                    } else {
+                        clearInterval(interval);
+                        window.location.href = 'ohno.html';
+                    }
+                }
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.code === 'Space') {
+                        if (!timerRunning) {
+                            camera.setAttribute('wasd-controls', 'acceleration: 50');
+                            camera.setAttribute('look-controls', 'pointerLockEnabled: true');
+                            camera.setAttribute('position', '0 2 0');
+                            camera.setAttribute('rotation', '0 -90 0');
+                            interval = setInterval(updateTimer, 1000);
+                            timerRunning = true;
+                        }
+                    }
+                });
+            }
+        });
+
+        AFRAME.registerComponent('change-text', {
+            init: function () {
+                var el = this.el;
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.code === 'Space') {
+                        // Change the text of the introduction box
+                        introBox.setAttribute('text', 'value', "To unravel the secrets veiled in art, gaze upon painting, and play your part. Her enigmatic smile hides a key, seek the brushstrokes, and you will see. In shadows deep, where colors blend, a message waits for you to send. When time stands still and the room falls hush, decode the masterpiece with a patient touch. Let your eyes dance on her painted grace, and you'll find the key to unlock the next space.");
+                    }
+                });
+            }
+        });
+
+        AFRAME.registerComponent('rotate-on-click', {
+            schema: {
+                paintingId: { type: 'string', default: '' }
+            },
+
+            init: function () {
+                var el = this.el;
+                var rotationThreshold = -90; // Define the rotation threshold
+                var paintingId = this.data.paintingId;
+                var success = document.getElementById('success');
+
+                // Add click event listener to the painting
+                el.addEventListener('click', function () {
+                    var currentRotation = el.getAttribute('rotation');
+                    var newRotation = currentRotation.z - 90;
+
+                    // Move the painting back behind the wall
+                    el.setAttribute('rotation', {
+                        x: currentRotation.x,
+                        y: currentRotation.y,
+                        z: newRotation
+                    });
+
+                    // Check if the rotation reaches the threshold
+                    if (paintingId === 'monaLisa' && newRotation <= rotationThreshold) {
+                        success.play();
+                        introBox.setAttribute('text', 'value', "congrats on finding the first key! you sure have Won the lottery. to the safe where the next clue lies. you will need to escape, beFore time runs out. Or else it will be Too lAte!");
+                        key1Found = true;
+                    }
+                });
+            }
+        });
+
+        AFRAME.registerComponent('lamp-light', {
+            init: function () {
+                // Get references to the lamp components
+                const stand = this.el;
+                const lightSource = this.el.querySelector('#light-source');
+
+                // Boolean variable to track light status
+                let isLightOn = false;
+                lightSource.setAttribute('light', 'intensity', 0);
+
+                // Function to toggle the light
+                const toggleLight = () => {
+                    if (isLightOn) {
+                        // Turn off the light
+                        lightSource.setAttribute('light', 'intensity', 0);
+                        hideText();
+                    } else {
+                        // Turn on the light
+                        lightSource.setAttribute('light', 'intensity', 0.9);
+                        revealText();
+                    }
+                    // Invert the light status
+                    isLightOn = !isLightOn;
+                };
+
+                // Add click event listener to the lamp stand
+                stand.addEventListener('click', toggleLight);
+
+                function revealText() {
+                    const text = document.createElement('a-entity');
+                    text.setAttribute('id', 'lampText');
+                    text.setAttribute('text', {
+                        value: '"A reader lives a thousand lives before he dies . . . The man who never reads lives only one." - George R R Martin',
+                        color: 'black',
+                        align: 'center',
+                        width: 3
+                    })
+                    text.setAttribute('position', '-3 3.4 7.7'); // Adjust position as needed
+                    text.setAttribute('rotation', '0 180 0');
+                    document.querySelector('a-scene').appendChild(text);
+                }
+
+                function hideText() {
+                    const existingText = document.getElementById('lampText');
+                    if (existingText) {
+                        existingText.parentNode.removeChild(existingText);
+                    }
+                }
+            }
+        });
+
+        AFRAME.registerComponent('safebox', {
+            init: function () {
+                var el = this.el;
+                var display = document.querySelector('a-text');
+                var code = "1428";
+                var currentInput = "";
+                var door = el.querySelector('#safeDoor');
+                var keypad = el.querySelector('#keypad');
+                var success = document.getElementById('success');
+
+                el.addEventListener('click', function (event) {
+                    if (event.target.tagName === 'A-ENTITY') {
+                        currentInput += event.target.getAttribute('text').value;
+
+                        if (currentInput.length === 4) {
+                            if (currentInput === code) {
+                                openSafeDoor();
+                                alert("Safe unlocked and key found!");
+                                display.setAttribute('value', '"It may be that you are not yourself luminous, but that you are a conductor of light. Some people without possessing genius have a remarkable power of stimulating it" - Sherlock Holmes');
+                                el.sceneEl.setAttribute('key2Found', true);
+                                key2Found = true;
+                                success.play();
+                            } else {
+                                alert("Incorrect code. Safe remains locked.");
+                            }
+                            currentInput = "";
+                        }
+                    }
+                });
+                function openSafeDoor() {
+                    // Rotate the door and buttons
+                    door.setAttribute('rotation', '0 90 0');
+                    keypad.setAttribute('rotation', '0 90 0');
+                    door.setAttribute('position', (door.getAttribute('position').x - .85) + ' ' + door.getAttribute('position').y + ' ' + (door.getAttribute('position').z - .3));
+                    keypad.setAttribute('position', (keypad.getAttribute('position').x - .55) + ' ' + keypad.getAttribute('position').y + ' ' + (keypad.getAttribute('position').z));
+                }
+            }
+        });
+
+        AFRAME.registerComponent('bookshelf', {
+            init: function () {
+                var el = this.el;
+                var door = el.querySelector('#door');
+                var GOTBook = el.querySelector('#GOTBook');
+                var success = document.getElementById('success');
+
+                // Click event listener on the book
+                GOTBook.addEventListener('click', function (event) {
+                    //openMainDoor();
+                    alert("You found another key congrats!");
+                    GOTBook.setAttribute('visible', false);
+                    el.sceneEl.setAttribute('key3Found', true);
+                    key3Found = true;
+                    success.play();
+                });
+            }
+        });
+
+        AFRAME.registerComponent('clickable', {
+            schema: {
+                keys: { type: 'array' }
+            },
+            init: function () {
+                this.el.addEventListener('click', () => this.checkKeys());
+            },
+            checkKeys: function () {
+                if (key1Found && key2Found && key3Found) {
+                    window.location.href = 'congrats.html';
+                } else {
+                    alert("You have not found all the keys yet!");
+                }
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+
+    <!-- sound effect for when a key is found-->
+    <!-- <audio id="success" controls volume = "1">
+        <source src="audio/success_bell-6776.mp3" type="audio/mp3">
+    </audio> -->
+
+    <a-scene background="color: white">
+        <a-entity environment=""></a-entity>
+        <!-- <a-entity environment="preset: forest; dressingAmount: 100"></a-entity>-->
+
+        <!-- Floor -->
+        <a-plane position="0 0.09 0" rotation="-90 0 0" width="16" height="16" repeat="4 2" color="#A36846"></a-plane>
+
+        <!-- Walls -->
+        <a-box position="0 0.3 -8" rotation="0 0 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+        <a-box position="8 0.3 0" rotation="0 90 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+        <a-box position="0 0.3 8" rotation="0 0 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+        <a-box position="-8 0.3 0" rotation="0 90 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+
+
+        <!-- Ceiling -->
+        <a-plane position="0 6 0" rotation="90 0 0" width="16" height="16" repeat="4 2" color="#a1a1a1"></a-plane>
+
+        <!-- Ambient Light -->
+        <a-light type="ambient" color="#888" intensity="0.8"></a-light>
+
+        <!-- Point Lights -->
+        <a-light type="point" color="#888" intensity="0.25" position="7 5.8 7"></a-light>
+        <a-light type="point" color="#888" intensity="0.25" position="7 5.8 -7"></a-light>
+        <a-light type="point" color="#888" intensity="0.25" position="-7 5.8 -7"></a-light>
+        <a-light type="point" color="#888" intensity="0.25" position="-7 5.8 7"></a-light>
+
+        <!-- Intro objects -->
+        <a-entity id="box" position="3.8 0 -4.6" rotation="0 -90 0">
+            <!-- Text box background plane -->
+            <a-plane id="textBox" rotation="0 0 0" width="3.3" height="2" position="0 1.95 -4" repeat="4 2"
+                color="black"></a-plane>
+            <!-- Introduction box -->
+            <!-- <a-text id="introBox" value="Introduction:
+        
+        You are locked in the professor's study. In order to get out, you have to follow clues 
+        to find keys that will unlock the door. Make sure you work fast before time runs out.
+        Use the WASD or arrow keys to move around the room, and use the mouse to look around.
+        When you have found all THREE keys click on the door to escape.
+        To get started press the space button. Good Luck!" color="white" width="3" height="4" position="-1.5 2 -4" change-text></a-text> -->
+
+        </a-entity>
+
+        <!-- Monet painting above the bed -->
+        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white" 
+            rotate-on-click></a-plane>
+
+        <!-- Camera with wasd-controls -->
+        <a-entity id='camera' camera look-controls wasd-controls="acceleration: 50" position="4 2 -5" rotation='0 -90 0'
+            timer>
+            <a-cursor></a-cursor>
+        </a-entity>
+
+        <!-- Clock -->
+        <a-entity position="6 4 -4.4" rotation="0 0 90">
+            <!-- Hour Hand -->
+            <a-box position="0.2 1.5 -3.3" width="0.05" height="0.6" depth="0.05" rotation="0 0 75"
+                color="black"></a-box>
+
+            <!-- Minute Hand -->
+            <a-box position="0 1.7 -3.3" width="0.05" height="0.6" depth="0.03" rotation="0 0 180"
+                color="black"></a-box>
+
+            <!-- Clock Base -->
+            <a-cylinder position="0 1.5 -3.5" radius="0.8" height="0.1" color="black" rotation="0 90 90"></a-cylinder>
+            <a-cylinder position="0 1.5 -3.4" radius="0.6" height="0.1" color="white" rotation="0 90 90"></a-cylinder>
+        </a-entity>
+
+        <!-- Lamp -->
+        <a-entity id="lamp-light" lamp-light>
+            <!-- Lamp Stand -->
+            <a-cylinder position="-6 1 7" radius="0.1" height="1.9" color="gray"></a-cylinder>
+
+            <!-- Lamp Shade -->
+            <a-cone position="-6 2 7" radius-bottom="0.5" radius-top="0" height="1" color="white"></a-cone>
+
+            <!-- Light Source (Sphere) -->
+            <a-sphere id="light-source" position="-6 2.5 7" radius="0.2" color="blue"
+                light="type: point; intensity: 0.9; color: blue"></a-sphere>
+        </a-entity>
+
+        <!-- Drawers for dresser -->
+        <a-box position="7.5 0.75 6.5" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 0.35 6.5" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 -0.05 6.5" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+
+        <a-box position="7.5 0.75 4.75" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 0.35 4.75" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 -0.05 4.75" rotation="0 90 0" width="1.75" height="0.6" depth="0.6"
+            color="#8B4513"></a-box>
+
+        <!-- Handles for dresser -->
+        <a-cylinder position="7.28 0.90 6.5" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.55 6.5" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.20 6.5" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+
+        <a-cylinder position="7.28 0.90 4.75" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.55 4.75" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.20 4.75" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+
+        <!-- Desk Top -->
+        <a-box position="7.5 1 0" rotation="0 90 0" width="3" height="0.1" depth="1" color="#8B4513"></a-box>
+
+        <!-- Legs for desk-->
+        <a-box position="7.88 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.2" color="#8B4513"></a-box>
+        <a-box position="7.05 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+
+        <!-- Drawers for desk-->
+        <a-box position="7.5 .5 -1.13" rotation="0 90 0" width=".75" height="1" depth="1" color="#8B4513"></a-box>
+
+        <!-- Handles for desk drawers-->
+        <a-cylinder position="7.08 0.90 -1.13" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.08 0.55 -1.13" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.08 0.20 -1.13" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+
+        <!-- Chair Seat -->
+        <a-box position="7 0.5 0.25" rotation="0 90 0" width=".6" height="0.1" depth=".6" color="#6495ED"></a-box>
+
+        <!-- Chair Back -->
+        <a-box position="6.72 0.9 0.25" rotation="0 90 0" width=".6" height=".8" depth="0.05" color="#6495ED"></a-box>
+
+        <!-- Chair Legs -->
+        <a-box position="7.25 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05"
+            color="#8B4513"></a-box>
+        <a-box position="7.25 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+        <a-box position="6.73 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05"
+            color="#8B4513"></a-box>
+        <a-box position="6.73 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+
+        <!-- Bookshelf -->
+        <a-entity id="bookshelf" bookshelf>
+
+             <!-- Back panel of the bookshelf (mirrored) -->
+             <a-plane position="-4 0.3 -7.8" rotation="0 0 0" width="2" height="5" color="#8B4513"></a-plane>
+        
+             <!-- Left side of the bookshelf -->
+             <a-box position="-4.75 0.3 -7.7" rotation="90 10 10" width="0.3" height="0.5" depth="5" color="#8B4513"></a-box>
+         
+             <!-- Right side of the bookshelf -->
+             <a-box position="-3.15 0.3 -7.7" rotation="90 0 10" width="0.3" height="0.5" depth="5" color="#8B4513"></a-box>
+         
+             <!-- Top of the bookshelf -->
+             <a-box position="-4 2.74 -7.7" rotation="0 90 0" width="0.5" height="0.1" depth="1.4" color="#8B4513"></a-box>
+         
+             <!-- First shelf of the bookshelf -->
+             <a-box position="-4 1.9 -7.7" rotation="0 90 0" width="0.5" height="0.1" depth="1.4" color="#8B4513"></a-box>
+         
+             <!-- Second shelf of the bookshelf -->
+             <a-box position="-4 1 -7.7" rotation="0 90 0" width="0.5" height="0.1" depth="1.3" color="#8B4513"></a-box>
+         
+             <!-- Bottom of bookshelf -->
+             <a-box position="-4 0.1 -7.7" rotation="0 90 0" width="0.5" height="0.2" depth="1.3" color="#8B4513"></a-box>
+            <!-- Game of Thrones Book -->
+            <a-image id="GOTBook" src="Books/gameOfThronesBook.jpeg" position="-4 1.3 -7.7" rotation="0 0 0" width="0.3"
+                height="0.5">
+
+                <a-entity event-set__click="key3Found: true"></a-entity>
+
+            </a-image>
+
+            <!-- Other Books -->
+            <a-box  src="Books/percyJackson.jpeg" position="-4.4 1.28 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/catchingFire.jpg" position="-4.4 0.44 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/normalPeople.jpeg" position="-4.4 1.28 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/weWereLiars.jpg" position="-3.6 0.44 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/1984.jpeg" position="-4.4 2.18 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/animalFarm.jpg" position="-3.6 1.28 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/shadowAndBone.jpg" position="-4 2.18 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/faultInOurStars.jpg" position="-4 0.44 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/sixOfCrows.jpg" position="-3.6 2.18 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+
+            <a-plane position="-4 1.3 -7.7" rotation="0 0 0" width=".3" height=".5" src="Keys/bookshelfKey.png"></a-plane>
+
+            <!-- Door -->
+            <a-box id="door" position="0 0.3 -7.99" rotation="0 0 0" scale="1.5 4.5 0.2" color="#6E260E"
+                clickable="keys: key1Found key2Found key3Found">
+                <a-entity event-set__doorclick="_event: click; _target: #door"
+                    event-set__doorunclick="_event: unclick; _target: #door; _attribute: material.color; value: #6E260E"
+                    event-set__doorclick="__alert: keys not found">
+                </a-entity>
+            </a-box>
+            <a-sphere id="knob" position="-0.5 1.15 -7.9" color="yellow" radius="0.1"></a-sphere>
+
+        </a-entity>
+    </a-scene>
+</body>
+
+</html>
