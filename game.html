@@ -8,9 +8,9 @@
     <!-- Link causes overexposure issues -->
     <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
     <script>
-        key1Found = false;
-        key2Found = false;
-        key3Found = false;
+        // key1Found = false;
+        // key2Found = false;
+        // key3Found = false;
 
         AFRAME.registerComponent('timer', {
             init: function () {
@@ -23,20 +23,6 @@
                 camera.removeAttribute('look-controls');
                 camera.removeAttribute('wasd-controls');
 
-                function updateTimer() {
-                    var minutes = Math.floor(initialTime / 60);
-                    var seconds = initialTime % 60;
-                    var formattedTime = ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-                    timerText.setAttribute('text', 'value', formattedTime);
-
-                    if (initialTime > 0) {
-                        initialTime--;
-                    } else {
-                        clearInterval(interval);
-                        window.location.href = 'ohno.html';
-                    }
-                }
-
                 document.addEventListener('keydown', function (event) {
                     if (event.code === 'Space') {
                         if (!timerRunning) {
@@ -44,7 +30,6 @@
                             camera.setAttribute('look-controls', 'pointerLockEnabled: true');
                             camera.setAttribute('position', '0 2 0');
                             camera.setAttribute('rotation', '0 -90 0');
-                            interval = setInterval(updateTimer, 1000);
                             timerRunning = true;
                         }
                     }
@@ -52,51 +37,51 @@
             }
         });
 
-        AFRAME.registerComponent('change-text', {
-            init: function () {
-                var el = this.el;
+        // AFRAME.registerComponent('change-text', {
+        //     init: function () {
+        //         var el = this.el;
 
-                document.addEventListener('keydown', function (event) {
-                    if (event.code === 'Space') {
-                        // Change the text of the introduction box
-                        introBox.setAttribute('text', 'value', "To unravel the secrets veiled in art, gaze upon painting, and play your part. Her enigmatic smile hides a key, seek the brushstrokes, and you will see. In shadows deep, where colors blend, a message waits for you to send. When time stands still and the room falls hush, decode the masterpiece with a patient touch. Let your eyes dance on her painted grace, and you'll find the key to unlock the next space.");
-                    }
-                });
-            }
-        });
+        //         document.addEventListener('keydown', function (event) {
+        //             if (event.code === 'Space') {
+        //                 // Change the text of the introduction box
+        //                 introBox.setAttribute('text', 'value', "To unravel the secrets veiled in art, gaze upon painting, and play your part. Her enigmatic smile hides a key, seek the brushstrokes, and you will see. In shadows deep, where colors blend, a message waits for you to send. When time stands still and the room falls hush, decode the masterpiece with a patient touch. Let your eyes dance on her painted grace, and you'll find the key to unlock the next space.");
+        //             }
+        //         });
+        //     }
+        // });
 
-        AFRAME.registerComponent('rotate-on-click', {
-            schema: {
-                paintingId: { type: 'string', default: '' }
-            },
+        // AFRAME.registerComponent('rotate-on-click', {
+        //     schema: {
+        //         paintingId: { type: 'string', default: '' }
+        //     },
 
-            init: function () {
-                var el = this.el;
-                var rotationThreshold = -90; // Define the rotation threshold
-                var paintingId = this.data.paintingId;
-                var success = document.getElementById('success');
+        //     init: function () {
+        //         var el = this.el;
+        //         var rotationThreshold = -90; // Define the rotation threshold
+        //         var paintingId = this.data.paintingId;
+        //         var success = document.getElementById('success');
 
-                // Add click event listener to the painting
-                el.addEventListener('click', function () {
-                    var currentRotation = el.getAttribute('rotation');
-                    var newRotation = currentRotation.z - 90;
+        //         // Add click event listener to the painting
+        //         el.addEventListener('click', function () {
+        //             var currentRotation = el.getAttribute('rotation');
+        //             var newRotation = currentRotation.z - 90;
 
-                    // Move the painting back behind the wall
-                    el.setAttribute('rotation', {
-                        x: currentRotation.x,
-                        y: currentRotation.y,
-                        z: newRotation
-                    });
+        //             // Move the painting back behind the wall
+        //             el.setAttribute('rotation', {
+        //                 x: currentRotation.x,
+        //                 y: currentRotation.y,
+        //                 z: newRotation
+        //             });
 
-                    // Check if the rotation reaches the threshold
-                    if (paintingId === 'monaLisa' && newRotation <= rotationThreshold) {
-                        success.play();
-                        introBox.setAttribute('text', 'value', "congrats on finding the first key! you sure have Won the lottery. to the safe where the next clue lies. you will need to escape, beFore time runs out. Or else it will be Too lAte!");
-                        key1Found = true;
-                    }
-                });
-            }
-        });
+        //             // Check if the rotation reaches the threshold
+        //             if (paintingId === 'monaLisa' && newRotation <= rotationThreshold) {
+        //                 success.play();
+        //                 introBox.setAttribute('text', 'value', "congrats on finding the first key! you sure have Won the lottery. to the safe where the next clue lies. you will need to escape, beFore time runs out. Or else it will be Too lAte!");
+        //                 key1Found = true;
+        //             }
+        //         });
+        //     }
+        // });
 
         AFRAME.registerComponent('lamp-light', {
             init: function () {
@@ -149,89 +134,26 @@
             }
         });
 
-        AFRAME.registerComponent('safebox', {
-            init: function () {
-                var el = this.el;
-                var display = document.querySelector('a-text');
-                var code = "1428";
-                var currentInput = "";
-                var door = el.querySelector('#safeDoor');
-                var keypad = el.querySelector('#keypad');
-                var success = document.getElementById('success');
-
-                el.addEventListener('click', function (event) {
-                    if (event.target.tagName === 'A-ENTITY') {
-                        currentInput += event.target.getAttribute('text').value;
-
-                        if (currentInput.length === 4) {
-                            if (currentInput === code) {
-                                openSafeDoor();
-                                alert("Safe unlocked and key found!");
-                                display.setAttribute('value', '"It may be that you are not yourself luminous, but that you are a conductor of light. Some people without possessing genius have a remarkable power of stimulating it" - Sherlock Holmes');
-                                el.sceneEl.setAttribute('key2Found', true);
-                                key2Found = true;
-                                success.play();
-                            } else {
-                                alert("Incorrect code. Safe remains locked.");
-                            }
-                            currentInput = "";
-                        }
-                    }
-                });
-                function openSafeDoor() {
-                    // Rotate the door and buttons
-                    door.setAttribute('rotation', '0 90 0');
-                    keypad.setAttribute('rotation', '0 90 0');
-                    door.setAttribute('position', (door.getAttribute('position').x - .85) + ' ' + door.getAttribute('position').y + ' ' + (door.getAttribute('position').z - .3));
-                    keypad.setAttribute('position', (keypad.getAttribute('position').x - .55) + ' ' + keypad.getAttribute('position').y + ' ' + (keypad.getAttribute('position').z));
-                }
-            }
-        });
-
-        AFRAME.registerComponent('bookshelf', {
-            init: function () {
-                var el = this.el;
-                var door = el.querySelector('#door');
-                var GOTBook = el.querySelector('#GOTBook');
-                var success = document.getElementById('success');
-
-                // Click event listener on the book
-                GOTBook.addEventListener('click', function (event) {
-                    //openMainDoor();
-                    alert("You found another key congrats!");
-                    GOTBook.setAttribute('visible', false);
-                    el.sceneEl.setAttribute('key3Found', true);
-                    key3Found = true;
-                    success.play();
-                });
-            }
-        });
-
-        AFRAME.registerComponent('clickable', {
-            schema: {
-                keys: { type: 'array' }
-            },
-            init: function () {
-                this.el.addEventListener('click', () => this.checkKeys());
-            },
-            checkKeys: function () {
-                if (key1Found && key2Found && key3Found) {
-                    window.location.href = 'congrats.html';
-                } else {
-                    alert("You have not found all the keys yet!");
-                }
-            }
-        });
+        // AFRAME.registerComponent('clickable', {
+        //     schema: {
+        //         keys: { type: 'array' }
+        //     },
+        //     init: function () {
+        //         this.el.addEventListener('click', () => this.checkKeys());
+        //     },
+        //     checkKeys: function () {
+        //         if (key1Found && key2Found && key3Found) {
+        //             window.location.href = 'congrats.html';
+        //         } else {
+        //             alert("You have not found all the keys yet!");
+        //         }
+        //     }
+        // });
 
     </script>
 </head>
 
 <body>
-
-    <!-- sound effect for when a key is found-->
-    <!-- <audio id="success" controls volume = "1">
-        <source src="audio/success_bell-6776.mp3" type="audio/mp3">
-    </audio> -->
 
     <a-scene background="color: white">
         <a-entity environment=""></a-entity>
@@ -265,19 +187,17 @@
             <a-plane id="textBox" rotation="0 0 0" width="3.3" height="2" position="0 1.95 -4" repeat="4 2"
                 color="black"></a-plane>
             <!-- Introduction box -->
-            <!-- <a-text id="introBox" value="Introduction:
-        
-        You are locked in the professor's study. In order to get out, you have to follow clues 
-        to find keys that will unlock the door. Make sure you work fast before time runs out.
-        Use the WASD or arrow keys to move around the room, and use the mouse to look around.
-        When you have found all THREE keys click on the door to escape.
-        To get started press the space button. Good Luck!" color="white" width="3" height="4" position="-1.5 2 -4" change-text></a-text> -->
+            <a-text id="introBox" value="LMC 3705 Final Project 
+            Rethika Ambalam and Ashna Kasireddy
+            
+            Click around to explore the classroom. Find data artifacts about various factors that influence school performance in Atlanta Public Schools, specifically in Fulton County.
+            
+            Press the space bar to begin!" color="white" width="3" height="4" position="-1.5 2 -4" change-text></a-text>
 
         </a-entity>
 
         <!-- Monet painting above the bed -->
-        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white" 
-            rotate-on-click></a-plane>
+        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white"></a-plane>
 
         <!-- Camera with wasd-controls -->
         <a-entity id='camera' camera look-controls wasd-controls="acceleration: 50" position="4 2 -5" rotation='0 -90 0'
@@ -335,37 +255,154 @@
         <a-cylinder position="7.28 0.20 4.75" rotation="90 90 0" radius="0.04" height="0.2"
             color="#FFED8A"></a-cylinder>
 
-        <!-- Desk Top -->
-        <a-box position="7.5 1 0" rotation="0 90 0" width="3" height="0.1" depth="1" color="#8B4513"></a-box>
+<!-- Teacher Desk and Chair Entity -->
+<a-entity id="teacher-desk-and-chair" position="-6.5 0 -14" rotation="0 90 0">
+    <!-- Desk Top -->
+    <a-box position="-7.5 1 0" rotation="0 90 0" width="3" height="0.1" depth="1" color="#8B4513"></a-box>
+  
+    <!-- Desk Legs -->
+    <a-box position="-7.88 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.2" color="#8B4513"></a-box>
+    <a-box position="-7.05 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+  
+    <!-- Drawers for Desk -->
+    <a-box position="-7.5 0.5 -1.13" rotation="0 90 0" width=".75" height="1" depth="1" color="#8B4513"></a-box>
+  
+    <!-- Handles for Desk Drawers -->
+    <a-cylinder position="-7.08 0.90 -1.13" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+    <a-cylinder position="-7.08 0.55 -1.13" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+    <a-cylinder position="-7.08 0.20 -1.13" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+  
+    <!-- Chair Seat -->
+    <a-box position="-7 0.5 0.25" rotation="0 90 0" width=".6" height="0.1" depth=".6" color="#6495ED"></a-box>
+  
+    <!-- Chair Back -->
+    <a-box position="-6.72 0.9 0.25" rotation="0 90 0" width=".6" height=".8" depth="0.05" color="#6495ED"></a-box>
+  
+    <!-- Chair Legs -->
+    <a-box position="-7.25 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+    <a-box position="-7.25 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+    <a-box position="-6.73 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+    <a-box position="-6.73 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+  </a-entity>
+  
 
-        <!-- Legs for desk-->
-        <a-box position="7.88 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.2" color="#8B4513"></a-box>
-        <a-box position="7.05 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+        <!-- <a-scene> -->
+            <!-- Parent entity for desks and chairs -->
+            <a-entity id="desks-and-chairs" position="-4 0 -4">
+              <!-- Template for desk and chair -->
+              <a-entity position="0 0 0" repeat="count: 6; x: 3; z: -3">
+                <!-- Desk Top -->
+                <a-box position="0 1 0" rotation="0 0 0" width="2" height="0.1" depth="1" color="#8B4513"></a-box>
+          
+                <!-- Desk Legs -->
+                <a-box position="0.9 0.5 0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+                <a-box position="-0.9 0.5 0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+                <a-box position="0.9 0.5 -0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+                <a-box position="-0.9 0.5 -0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+          
+                <!-- Chair Seat -->
+                <a-box position="0 0.5 -0.75" rotation="0 90 0" width="0.6" height="0.1" depth="0.6" color="#6495ED"></a-box>
+          
+                <!-- Chair Back -->
+                <a-box position="0 0.9 -1.05" rotation="0 0 0" width="0.6" height="0.8" depth="0.05" color="#6495ED"></a-box>
+          
+                <!-- Chair Legs -->
+                <a-box position="0.25 0.25 -0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+                <a-box position="0.25 0.25 -1" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+                <a-box position="-0.25 0.25 -0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+                <a-box position="-0.25 0.25 -1" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+              </a-entity>
+            </a-entity>
+          <!-- </a-scene> -->
 
-        <!-- Drawers for desk-->
-        <a-box position="7.5 .5 -1.13" rotation="0 90 0" width=".75" height="1" depth="1" color="#8B4513"></a-box>
+          <script>
+            // Number of desks and spacing
+            const numRows = 4; // Number of rows
+            const numCols = 3; // Number of columns
+            const xSpacing = 4; // Spacing between desks in the x-axis
+            const zSpacing = 3; // Spacing between desks in the z-axis
+          
+            // Reference to the parent entity
+            const parentEntity = document.getElementById("desks-and-chairs");
+          
+            for (let row = 0; row < numRows; row++) {
+              for (let col = 0; col < numCols; col++) {
+                // Create a parent entity for each desk and chair
+                const deskChairEntity = document.createElement("a-entity");
+          
+                // Position the desk and chair
+                const xPos = col * xSpacing;
+                const zPos = row * zSpacing;
+                deskChairEntity.setAttribute("position", `${xPos} 0 ${zPos}`);
+          
+                // Add the desk top
+                const deskTop = document.createElement("a-box");
+                deskTop.setAttribute("position", "0 1 0");
+                deskTop.setAttribute("width", "2");
+                deskTop.setAttribute("height", "0.1");
+                deskTop.setAttribute("depth", "1");
+                deskTop.setAttribute("color", "#8B4513");
+                deskChairEntity.appendChild(deskTop);
+          
+                // Add desk legs
+                const legPositions = [
+                  "0.9 0.5 0.35",
+                  "-0.9 0.5 0.35",
+                  "0.9 0.5 -0.35",
+                  "-0.9 0.5 -0.35",
+                ];
+                legPositions.forEach((pos) => {
+                  const leg = document.createElement("a-box");
+                  leg.setAttribute("position", pos);
+                  leg.setAttribute("width", "0.2");
+                  leg.setAttribute("height", "1");
+                  leg.setAttribute("depth", "0.1");
+                  leg.setAttribute("color", "#8B4513");
+                  deskChairEntity.appendChild(leg);
+                });
+          
+                // Add chair seat
+                const chairSeat = document.createElement("a-box");
+                chairSeat.setAttribute("position", "0 0.5 -0.75");
+                chairSeat.setAttribute("width", "0.6");
+                chairSeat.setAttribute("height", "0.1");
+                chairSeat.setAttribute("depth", "0.6");
+                chairSeat.setAttribute("color", "#6495ED");
+                deskChairEntity.appendChild(chairSeat);
+          
+                // Add chair back
+                const chairBack = document.createElement("a-box");
+                chairBack.setAttribute("position", "0 0.9 -1.05");
+                chairBack.setAttribute("width", "0.6");
+                chairBack.setAttribute("height", "0.8");
+                chairBack.setAttribute("depth", "0.05");
+                chairBack.setAttribute("color", "#6495ED");
+                deskChairEntity.appendChild(chairBack);
+          
+                // Add chair legs
+                const chairLegPositions = [
+                  "0.25 0.25 -0.5",
+                  "0.25 0.25 -1",
+                  "-0.25 0.25 -0.5",
+                  "-0.25 0.25 -1",
+                ];
+                chairLegPositions.forEach((pos) => {
+                  const leg = document.createElement("a-box");
+                  leg.setAttribute("position", pos);
+                  leg.setAttribute("width", "0.05");
+                  leg.setAttribute("height", "0.5");
+                  leg.setAttribute("depth", "0.05");
+                  leg.setAttribute("color", "#8B4513");
+                  deskChairEntity.appendChild(leg);
+                });
+          
+                // Append the desk and chair entity to the parent
+                parentEntity.appendChild(deskChairEntity);
+              }
+            }
+          </script>
+          
 
-        <!-- Handles for desk drawers-->
-        <a-cylinder position="7.08 0.90 -1.13" rotation="90 90 0" radius="0.04" height="0.2"
-            color="#FFED8A"></a-cylinder>
-        <a-cylinder position="7.08 0.55 -1.13" rotation="90 90 0" radius="0.04" height="0.2"
-            color="#FFED8A"></a-cylinder>
-        <a-cylinder position="7.08 0.20 -1.13" rotation="90 90 0" radius="0.04" height="0.2"
-            color="#FFED8A"></a-cylinder>
-
-        <!-- Chair Seat -->
-        <a-box position="7 0.5 0.25" rotation="0 90 0" width=".6" height="0.1" depth=".6" color="#6495ED"></a-box>
-
-        <!-- Chair Back -->
-        <a-box position="6.72 0.9 0.25" rotation="0 90 0" width=".6" height=".8" depth="0.05" color="#6495ED"></a-box>
-
-        <!-- Chair Legs -->
-        <a-box position="7.25 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05"
-            color="#8B4513"></a-box>
-        <a-box position="7.25 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
-        <a-box position="6.73 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05"
-            color="#8B4513"></a-box>
-        <a-box position="6.73 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
 
         <!-- Bookshelf -->
         <a-entity id="bookshelf" bookshelf>
@@ -412,11 +449,7 @@
             <a-plane position="-4 1.3 -7.7" rotation="0 0 0" width=".3" height=".5" src="Keys/bookshelfKey.png"></a-plane>
 
             <!-- Door -->
-            <a-box id="door" position="0 0.3 -7.99" rotation="0 0 0" scale="1.5 4.5 0.2" color="#6E260E"
-                clickable="keys: key1Found key2Found key3Found">
-                <a-entity event-set__doorclick="_event: click; _target: #door"
-                    event-set__doorunclick="_event: unclick; _target: #door; _attribute: material.color; value: #6E260E"
-                    event-set__doorclick="__alert: keys not found">
+            <a-box id="door" position="0 0.3 -7.99" rotation="0 0 0" scale="1.5 4.5 0.2" color="#6E260E">
                 </a-entity>
             </a-box>
             <a-sphere id="knob" position="-0.5 1.15 -7.9" color="yellow" radius="0.1"></a-sphere>
