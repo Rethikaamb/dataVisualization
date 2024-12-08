@@ -65,12 +65,6 @@
                 function revealText() {
                     const text = document.createElement('a-entity');
                     text.setAttribute('id', 'lampText');
-                    text.setAttribute('text', {
-                        value: '"A reader lives a thousand lives before he dies . . . The man who never reads lives only one." - George R R Martin',
-                        color: 'black',
-                        align: 'center',
-                        width: 3
-                    })
                     text.setAttribute('position', '-3 3.4 7.7'); // Adjust position as needed
                     text.setAttribute('rotation', '0 180 0');
                     document.querySelector('a-scene').appendChild(text);
@@ -108,7 +102,7 @@
         <a-plane position="0 6 0" rotation="90 0 0" width="16" height="16" repeat="4 2" color="#a1a1a1"></a-plane>
 
         <!-- Ambient Light -->
-        <a-light type="ambient" color="#888" intensity="1.75"></a-light>
+        <a-light type="ambient" color="#888" intensity="0.5"></a-light>
 
         <!-- Point Lights -->
         <a-light type="point" color="#888" intensity="0.25" position="7 5.8 7"></a-light>
@@ -149,12 +143,21 @@
               const currentText = clickLabelWindow.getAttribute('value');
               
               if (currentText === 'Click here') {
-                // Change text to 'You clicked the dollar bill!'
-                clickLabelWindow.setAttribute('value', 'This bar chart displays the cohort graduation rates by school in APS, comparing multiple years. It highlights disparities in graduation outcomes, with some schools, such as CSK and North Atlanta, achieving near-perfect rates, while others, like Douglass and Mays, fall significantly below state averages. This data specifically reveals which schools may need targeted resources and interventions, such as improved counseling services, academic support programs, or community engagement initiatives, to support students in completing their education.');
-                clickLabelWindow.setAttribute('width', '4');
+                clickLabelWindow.setAttribute('value', 'This visualization highlights poverty rates in APS areas, with 18.1% of individuals living below the poverty line, including 27% of children under 18 and 22% of seniors. Schools in high-poverty areas may need increased funding for nutrition programs, school supplies, and community outreach to address barriers to learning. Click the graph for next slide.');
+                clickLabelWindow.setAttribute('position', '-1.5 -1.6 0.2');
+                windowImage.setAttribute('src', 'images/demographics.png');
+                clickLabelWindow.setAttribute('wrapCount', '10'); // Set wrap count to determine when to wrap
+            } else if (currentText === 'This visualization highlights poverty rates in APS areas, with 18.1% of individuals living below the poverty line, including 27% of children under 18 and 22% of seniors. Schools in high-poverty areas may need increased funding for nutrition programs, school supplies, and community outreach to address barriers to learning. Click the graph for next slide.') {
+                clickLabelWindow.setAttribute('value', 'The income distribution chart shows per capita income ($64,950) and median household income ($85,880) in APS communities. While incomes are higher than state averages, the chart also highlights that 33% of households earn under $50,000, underscoring significant income inequality. This disparity suggests the need for targeted programs to bridge the gap in educational access and resources. Click the graph for next slide.');
+                windowImage.setAttribute('src', 'images/familyIncomes.png');
+            } else if (currentText === 'The income distribution chart shows per capita income ($64,950) and median household income ($85,880) in APS communities. While incomes are higher than state averages, the chart also highlights that 33% of households earn under $50,000, underscoring significant income inequality. This disparity suggests the need for targeted programs to bridge the gap in educational access and resources. Click the graph for next slide.') {
+                clickLabelWindow.setAttribute('value', 'This chart provides a breakdown of Atlanta Public Schools revenue sources, with 74.3% coming from local funding, 17.2% from the state, and 8.5% from federal contributions. The data also highlights revenue per student ($22,105) and expenses per student ($18,745), emphasizing how financial resources are distributed. Schools in low-income neighborhoods may need increased funding from state or federal sources to address inequities.');
+                windowImage.setAttribute('src', 'images/revenue.png');
             } else {
                 // Reset text to 'Click here'
                 clickLabelWindow.setAttribute('value', 'Click here');
+                windowImage.setAttribute('src', 'images/windowImage.jpg');
+                clickLabelWindow.setAttribute('position', '-0.25 -1.25 0.2');
               }
             });
           </script>
@@ -170,19 +173,19 @@
                 const classOf2022 = document.getElementById('classOf2022');
                 const clickLabelClassOf2022 = document.getElementById('clickLabelClassOf2022');
               
-                // Add click event listener to dollar bill
                 classOf2022.addEventListener('click', function() {
                   // Get current value of text to determine what to toggle
                   const currentText = clickLabelClassOf2022.getAttribute('value');
                   
                   if (currentText === 'Click here') {
-                    // Change text to 'You clicked the dollar bill!'
                     clickLabelClassOf2022.setAttribute('value', 'This bar chart displays the cohort graduation rates by school in APS, comparing multiple years. It highlights disparities in graduation outcomes, with some schools, such as CSK and North Atlanta, achieving near-perfect rates, while others, like Douglass and Mays, fall significantly below state averages. This data specifically reveals which schools may need targeted resources and interventions, such as improved counseling services, academic support programs, or community engagement initiatives, to support students in completing their education.');
-                    clickLabelClassOf2022.setAttribute('position', '-1.5 -0.5 0.2');
+                    clickLabelClassOf2022.setAttribute('position', '2 -0.2 0.2');
+                    classOf2022.setAttribute('src', 'images/SeniorsGraph.png');
                 } else {
                     // Reset text to 'Click here'
                     clickLabelClassOf2022.setAttribute('value', 'Click here');
                     clickLabelClassOf2022.setAttribute('position', '-0.25 1.5 0.2');
+                    classOf2022.setAttribute('src', 'images/classof2022Image.jpeg');
                   }
                 });
               </script>
@@ -197,19 +200,19 @@
             const whiteBoard = document.getElementById('whiteBoard');
             const clickLabelWhiteboard = document.getElementById('clickLabelWhiteboard');
           
-            // Add click event listener to dollar bill
             whiteBoard.addEventListener('click', function() {
               // Get current value of text to determine what to toggle
               const currentText = clickLabelWhiteboard.getAttribute('value');
               
               if (currentText === 'Click here') {
-                // Change text to 'You clicked the dollar bill!'
                 clickLabelWhiteboard.setAttribute('value', 'This chart showcases how Atlanta Public Schools allocate their funds, with most spending directed toward instruction ($551.2 million), followed by support services ($375.2 million), and a smaller portion for other expenses ($17.0 million). While the emphasis on instruction is clear, disparities in resource distribution could mean that some schools lack access to critical technology or support staff, impacting student outcomes.');
-                clickLabelWhiteboard.setAttribute('position', '-1.5 -0.5 0.2');
+                clickLabelWhiteboard.setAttribute('position', '-1.5 -2.05 0.2');
+                whiteBoard.setAttribute('src', 'images/funding.png');
             } else {
                 // Reset text to 'Click here'
                 clickLabelWhiteboard.setAttribute('value', 'Click here');
                 clickLabelWhiteboard.setAttribute('position', '-0.25 0 0.2');
+                whiteBoard.setAttribute('src', 'images/whiteboard.png');
               }
             });
           </script>
@@ -278,13 +281,13 @@
 
     <!-- Dollar Bill 1 -->
     <!-- Adjusted a-text to match the plane's direction -->
-<a-plane position="-7.5 1.12 1" rotation="-90 -20 0" width="0.7" height="0.3"  src="images/dollarBill.jpeg" id="dollarBill1">
+<a-plane position="-7.5 1.12 1" rotation="-90 -20 0" width="0.7" height="0.3" color="green" src="images/dollarBill.jpeg" id="dollarBill1">
     <a-text value="Click the dollar bill" position="0 1 0.5" rotation="30 -90 -90" scale="0.5 0.5 0.5" color="black" id="clickLabelDollar1" visible="true"></a-text>
 </a-plane>
 
   
     <!-- Dollar Bill 2 -->
-    <a-plane position="-7.5 1.1 1" rotation="-90 0 0" width="0.7" height="0.3" src="images/dollarBill.jpeg">
+    <a-plane position="-7.5 1.1 1" color="green" rotation="-90 0 0" width="0.7" height="0.3" src="images/dollarBill.jpeg">
     </a-plane>
 
   
@@ -320,18 +323,39 @@
   
     // Add click event listener to dollar bill
     dollarBill1.addEventListener('click', function() {
-      // Get current value of text to determine what to toggle
-      const currentText = clickLabelDollar1.getAttribute('value');
+      // Get the current src of the dollar bill to determine what to toggle
+      const currentSrc = dollarBill1.getAttribute('src');
       
-      if (currentText === 'Click the dollar bill') {
-        // Change text to 'You clicked the dollar bill!'
-        clickLabelDollar1.setAttribute('value', 'The bar chart illustrates the distribution of teacher salaries in APS. The average salary is $43,171/year ($21/hour), but significant variation exists. Schools with higher salaries may attract more experienced teachers, correlating with better student outcomes, while schools with lower salaries could face challenges in retaining quality educators. Addressing these disparities could directly impact academic achievement.');
+      if (currentSrc === 'images/dollarBill.jpeg') {
+        // Change the dollar bill image and properties
+        dollarBill1.setAttribute('src', 'images/teacherSalary.png');
+        dollarBill1.setAttribute('width', '1.5');
+        dollarBill1.setAttribute('height', '1.5');
+        dollarBill1.setAttribute('rotation', '0 -90 360'); // Rotate the dollar bill
+        dollarBill1.setAttribute('position', '-6.5 2 0'); // Position adjusted for the new size
+        clickLabelDollar1.setAttribute('rotation', ' 0 0');
+        clickLabelDollar1.setAttribute('position', '-0.75 1.5 0');
+  
+        clickLabelDollar1.setAttribute('value', 'The bar chart illustrates the distribution of teacher salaries in APS. The average salary is $43,171/year ($21/hour), but significant variation exists. Schools with higher salaries may attract more experienced teachers, correlating with better student outcomes, while schools with lower salaries could face challenges in retaining quality educators. Addressing these disparities could directly impact academic achievement. Click the Graph to return.');
+        dollarBill1.setAttribute('color', 'white');
       } else {
-        // Reset text to 'Click here'
+        // Reset the dollar bill properties
+        dollarBill1.setAttribute('src', 'images/dollarBill.jpeg');
+        dollarBill1.setAttribute('width', '0.7');
+        dollarBill1.setAttribute('height', '0.3');
+        dollarBill1.setAttribute('rotation', '-90 -20 0');
+        dollarBill1.setAttribute('position', '-7.5 1.12 1'); // Reset position of the dollar bill
+        dollarBill1.setAttribute('color', 'green');
+
         clickLabelDollar1.setAttribute('value', 'Click the dollar bill');
+        clickLabelDollar1.setAttribute('position', '0 1 0.5');
+        clickLabelDollar1.setAttribute('rotation', '30 -90 -90');
+  
       }
-    });
+    }); 
   </script>
+  
+  
 
         <!-- <a-scene> -->
             <!-- Parent entity for desks and chairs -->
@@ -384,11 +408,23 @@
                           'value',
                           'This bar chart illustrates the average ACT composite scores by APS high schools, highlighting disparities in academic achievement across the district. Schools like Midtown and Classical achieve the highest scores, likely reflecting better resource allocation, access to preparatory programs, and teacher quality. Conversely, schools like Carver and Douglass fall behind, indicating areas where additional instructional resources or test preparation support may be needed.');
 
-                        clickLabelACT.setAttribute('position', '-0.8 0 0.8');
+                        clickLabelACT.setAttribute('rotation', '0 0 0');
+                        clickLabelACT.setAttribute('position', '-3.25 0 0');
+                        testPlane.setAttribute('src', 'images/ACTScores.png');
+                        testPlane.setAttribute('width', '1.5');
+                        testPlane.setAttribute('height', '1.5');
+                        testPlane.setAttribute('rotation', '0 180 0');
+                        testPlane.setAttribute('position', '-1 2 0');
                       } else {
                         // Reset text to the original prompt
                         clickLabelACT.setAttribute('value', 'Click the test');
                         clickLabelACT.setAttribute('position', '-0.2 0 0.2');
+                        clickLabelACT.setAttribute('rotation', '90 0 0');
+                        testPlane.setAttribute('src', 'images/test3705.png');
+                        testPlane.setAttribute('width', '0.8');
+                        testPlane.setAttribute('height', '0.8');
+                        testPlane.setAttribute('rotation', '-90 0 180');
+                        testPlane.setAttribute('position', '0 1.1 -0.98');
                       }
                     });
                   </script>
