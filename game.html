@@ -8,9 +8,6 @@
     <!-- Link causes overexposure issues -->
     <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
     <script>
-        // key1Found = false;
-        // key2Found = false;
-        // key3Found = false;
 
         AFRAME.registerComponent('timer', {
             init: function () {
@@ -36,52 +33,6 @@
                 });
             }
         });
-
-        // AFRAME.registerComponent('change-text', {
-        //     init: function () {
-        //         var el = this.el;
-
-        //         document.addEventListener('keydown', function (event) {
-        //             if (event.code === 'Space') {
-        //                 // Change the text of the introduction box
-        //                 introBox.setAttribute('text', 'value', "To unravel the secrets veiled in art, gaze upon painting, and play your part. Her enigmatic smile hides a key, seek the brushstrokes, and you will see. In shadows deep, where colors blend, a message waits for you to send. When time stands still and the room falls hush, decode the masterpiece with a patient touch. Let your eyes dance on her painted grace, and you'll find the key to unlock the next space.");
-        //             }
-        //         });
-        //     }
-        // });
-
-        // AFRAME.registerComponent('rotate-on-click', {
-        //     schema: {
-        //         paintingId: { type: 'string', default: '' }
-        //     },
-
-        //     init: function () {
-        //         var el = this.el;
-        //         var rotationThreshold = -90; // Define the rotation threshold
-        //         var paintingId = this.data.paintingId;
-        //         var success = document.getElementById('success');
-
-        //         // Add click event listener to the painting
-        //         el.addEventListener('click', function () {
-        //             var currentRotation = el.getAttribute('rotation');
-        //             var newRotation = currentRotation.z - 90;
-
-        //             // Move the painting back behind the wall
-        //             el.setAttribute('rotation', {
-        //                 x: currentRotation.x,
-        //                 y: currentRotation.y,
-        //                 z: newRotation
-        //             });
-
-        //             // Check if the rotation reaches the threshold
-        //             if (paintingId === 'monaLisa' && newRotation <= rotationThreshold) {
-        //                 success.play();
-        //                 introBox.setAttribute('text', 'value', "congrats on finding the first key! you sure have Won the lottery. to the safe where the next clue lies. you will need to escape, beFore time runs out. Or else it will be Too lAte!");
-        //                 key1Found = true;
-        //             }
-        //         });
-        //     }
-        // });
 
         AFRAME.registerComponent('lamp-light', {
             init: function () {
@@ -196,8 +147,10 @@
 
         </a-entity>
 
-        <!-- Monet painting above the bed -->
-        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white"></a-plane>
+        <!-- whiteboard -->
+        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white">
+            <a-text value="Click here" position="-0.25 0 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black" id="clickLabelWhiteboard"></a-text>
+        </a-plane>
 
         <!-- Camera with wasd-controls -->
         <a-entity id='camera' camera look-controls wasd-controls="acceleration: 50" position="4 2 -5" rotation='0 -90 0'
@@ -222,6 +175,7 @@
 
         <!-- Lamp -->
         <a-entity id="lamp-light" lamp-light>
+            
             <!-- Lamp Stand -->
             <a-cylinder position="-6 1 7" radius="0.1" height="1.9" color="gray"></a-cylinder>
 
@@ -259,6 +213,18 @@
 <a-entity id="teacher-desk-and-chair" position="-6.5 0 -14" rotation="0 90 0">
     <!-- Desk Top -->
     <a-box position="-7.5 1 0" rotation="0 90 0" width="3" height="0.1" depth="1" color="#8B4513"></a-box>
+
+    <!-- Dollar Bill 1 -->
+    <a-plane position="-7.5 1.12 1" rotation="-90 -20 0" width="0.7" height="0.3" color="green" src="images/dollarBill.jpeg" id="dollarBill1">
+        <a-text value="Click here" position="-0.25 0 0.2" rotation="90 0 0" scale="0.5 0.5 0.5" color="#FFFFFF" id="clickLabelDollar1" visible="true"></a-text>
+        <!-- Text to be changed after click -->
+        <!-- <a-text id="showText" value="You clicked the dollar bill!" position="-0.25 0 0.2" rotation="90 0 0" scale="1 1 1" color="black" visible="false"></a-text> -->
+    </a-plane>
+  
+    <!-- Dollar Bill 2 -->
+    <a-plane position="-7.5 1.1 1" rotation="-90 0 0" width="0.7" height="0.3" color="green" src="images/dollarBill.jpeg">
+    </a-plane>
+
   
     <!-- Desk Legs -->
     <a-box position="-7.88 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.2" color="#8B4513"></a-box>
@@ -284,6 +250,26 @@
     <a-box position="-6.73 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
     <a-box position="-6.73 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
   </a-entity>
+
+  <script>
+    // Get the elements
+    const dollarBill1 = document.getElementById('dollarBill1');
+    const clickLabelDollar1 = document.getElementById('clickLabelDollar1');
+  
+    // Add click event listener to dollar bill
+    dollarBill1.addEventListener('click', function() {
+      // Get current value of text to determine what to toggle
+      const currentText = clickLabelDollar1.getAttribute('value');
+      
+      if (currentText === 'Click here') {
+        // Change text to 'You clicked the dollar bill!'
+        clickLabelDollar1.setAttribute('value', 'You clicked the dollar bill!');
+      } else {
+        // Reset text to 'Click here'
+        clickLabelDollar1.setAttribute('value', 'Click here');
+      }
+    });
+  </script>
   
 
         <!-- <a-scene> -->
@@ -401,12 +387,10 @@
               }
             }
           </script>
-          
-
 
         <!-- Bookshelf -->
         <a-entity id="bookshelf" bookshelf>
-
+            <a-text value="Click here" position="0 1.5 0" rotation="0 0 0" scale="2 2 2" color="black" id="clickLabelWBookshelf"></a-text>
              <!-- Back panel of the bookshelf (mirrored) -->
              <a-plane position="-4 0.3 -7.8" rotation="0 0 0" width="2" height="5" color="#8B4513"></a-plane>
         
