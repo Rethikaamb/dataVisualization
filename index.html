@@ -3,47 +3,571 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            /* Remove default margin */
-            overflow: hidden;
-            /* Prevent horizontal scroll */
-        }
+    <title>Escape Room Game</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- Link causes overexposure issues -->
+    <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+    <script>
 
-        .container {
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            background: white;
-            overflow: hidden;
-            /* Hide overflow to prevent scroll bars */
-        }
+        AFRAME.registerComponent('timer', {
+            init: function () {
+                var timerText = this.el;
+                var initialTime = 15 * 60; // 5 minutes in seconds
+                var timerRunning = false;
+                var interval;
 
-        .background-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Ensure the image covers the entire container */
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
+                var camera = document.querySelector('[camera]');
+                camera.removeAttribute('look-controls');
+                camera.removeAttribute('wasd-controls');
 
-        #clickable-area {
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-    </style>
+                document.addEventListener('keydown', function (event) {
+                    if (event.code === 'Space') {
+                        if (!timerRunning) {
+                            camera.setAttribute('wasd-controls', 'acceleration: 50');
+                            camera.setAttribute('look-controls', 'pointerLockEnabled: true');
+                            camera.setAttribute('position', '0 2 0');
+                            camera.setAttribute('rotation', '0 -90 0');
+                            timerRunning = true;
+                        }
+                    }
+                });
+            }
+        });
 
+        AFRAME.registerComponent('lamp-light', {
+            init: function () {
+                // Get references to the lamp components
+                const stand = this.el;
+                const lightSource = this.el.querySelector('#light-source');
+
+                // Boolean variable to track light status
+                let isLightOn = false;
+                lightSource.setAttribute('light', 'intensity', 0);
+
+                // Function to toggle the light
+                const toggleLight = () => {
+                    if (isLightOn) {
+                        // Turn off the light
+                        lightSource.setAttribute('light', 'intensity', 0);
+                        hideText();
+                    } else {
+                        // Turn on the light
+                        lightSource.setAttribute('light', 'intensity', 0.9);
+                        revealText();
+                    }
+                    // Invert the light status
+                    isLightOn = !isLightOn;
+                };
+
+                // Add click event listener to the lamp stand
+                stand.addEventListener('click', toggleLight);
+
+                function revealText() {
+                    const text = document.createElement('a-entity');
+                    text.setAttribute('id', 'lampText');
+                    text.setAttribute('position', '-3 3.4 7.7'); // Adjust position as needed
+                    text.setAttribute('rotation', '0 180 0');
+                    document.querySelector('a-scene').appendChild(text);
+                }
+
+                function hideText() {
+                    const existingText = document.getElementById('lampText');
+                    if (existingText) {
+                        existingText.parentNode.removeChild(existingText);
+                    }
+                }
+            }
+        });
+
+    </script>
 </head>
 
 <body>
-    <script>
-        window.location.href = "game.html";
-      </script>
+
+    <a-scene background="color: white">
+        <a-entity environment=""></a-entity>
+        <!-- <a-entity environment="preset: forest; dressingAmount: 100"></a-entity> -->
+
+        <!-- Floor -->
+        <a-plane position="0 0.09 0" rotation="-90 0 0" width="16" height="16" repeat="4 2" color="#A36846"></a-plane>
+
+        <!-- Walls -->
+        <a-box position="0 0.3 -8" rotation="0 0 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+        <a-box position="8 0.3 0" rotation="0 90 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+        <a-box position="0 0.3 8" rotation="0 0 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+        <a-box position="-8 0.3 0" rotation="0 90 0" scale="16 12 0.2" color="#a1a1a1"></a-box>
+
+
+        <!-- Ceiling -->
+        <a-plane position="0 6 0" rotation="90 0 0" width="16" height="16" repeat="4 2" color="#a1a1a1"></a-plane>
+
+        <!-- Ambient Light -->
+        <a-light type="ambient" color="#888" intensity="0.5"></a-light>
+
+        <!-- Point Lights -->
+        <a-light type="point" color="#888" intensity="0.25" position="7 5.8 7"></a-light>
+        <a-light type="point" color="#888" intensity="0.25" position="7 5.8 -7"></a-light>
+        <a-light type="point" color="#888" intensity="0.25" position="-7 5.8 -7"></a-light>
+        <a-light type="point" color="#888" intensity="0.25" position="-7 5.8 7"></a-light>
+
+        <!-- Intro objects -->
+        <a-entity id="box" position="3.8 0 -4.6" rotation="0 -90 0">
+            <!-- Text box background plane -->
+            <a-plane id="textBox" rotation="0 0 0" width="3.3" height="2" position="0 1.95 -4" repeat="4 2"
+                color="black"></a-plane>
+            <!-- Introduction box -->
+            <a-text id="introBox" value="LMC 3705 Final Project 
+            Rethika Ambalam and Ashna Kasireddy
+            
+            Click around to explore the classroom. Find data artifacts about various factors that influence school performance in Atlanta Public Schools, specifically in Fulton County.
+            
+            Press the space bar to begin!" color="white" width="3" height="4" position="-1.5 2 -4" change-text></a-text>
+
+        </a-entity>
+
+        <!-- Window Image -->
+        <a-plane position="7.5 2.5 1" rotation="0 -90 0" width="4" height="2" color="white" src="images/windowImage.jpg"
+            id="windowImage">
+            <a-text value="Click here" position="-0.25 -1.25 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black"
+                id="clickLabelWindow"></a-text>
+        </a-plane>
+
+        <script>
+            // Get the elements
+            const windowImage = document.getElementById('windowImage');
+            const clickLabelWindow = document.getElementById('clickLabelWindow');
+          
+            // Add click event listener to dollar bill
+            windowImage.addEventListener('click', function() {
+              // Get current value of text to determine what to toggle
+              const currentText = clickLabelWindow.getAttribute('value');
+              
+              if (currentText === 'Click here') {
+                clickLabelWindow.setAttribute('value', 'This visualization highlights poverty rates in APS areas, with 18.1% of individuals living below the poverty line, including 27% of children under 18 and 22% of seniors. Schools in high-poverty areas may need increased funding for nutrition programs, school supplies, and community outreach to address barriers to learning. Click the graph for next slide.');
+                clickLabelWindow.setAttribute('position', '-1.5 -1.6 0.2');
+                windowImage.setAttribute('src', 'images/demographics.png');
+                clickLabelWindow.setAttribute('wrapCount', '10'); // Set wrap count to determine when to wrap
+            } else if (currentText === 'This visualization highlights poverty rates in APS areas, with 18.1% of individuals living below the poverty line, including 27% of children under 18 and 22% of seniors. Schools in high-poverty areas may need increased funding for nutrition programs, school supplies, and community outreach to address barriers to learning. Click the graph for next slide.') {
+                clickLabelWindow.setAttribute('value', 'The income distribution chart shows per capita income ($64,950) and median household income ($85,880) in APS communities. While incomes are higher than state averages, the chart also highlights that 33% of households earn under $50,000, underscoring significant income inequality. This disparity suggests the need for targeted programs to bridge the gap in educational access and resources. Click the graph for next slide.');
+                windowImage.setAttribute('src', 'images/familyIncomes.png');
+            } else if (currentText === 'The income distribution chart shows per capita income ($64,950) and median household income ($85,880) in APS communities. While incomes are higher than state averages, the chart also highlights that 33% of households earn under $50,000, underscoring significant income inequality. This disparity suggests the need for targeted programs to bridge the gap in educational access and resources. Click the graph for next slide.') {
+                clickLabelWindow.setAttribute('value', 'This chart provides a breakdown of Atlanta Public Schools revenue sources, with 74.3% coming from local funding, 17.2% from the state, and 8.5% from federal contributions. The data also highlights revenue per student ($22,105) and expenses per student ($18,745), emphasizing how financial resources are distributed. Schools in low-income neighborhoods may need increased funding from state or federal sources to address inequities.');
+                windowImage.setAttribute('src', 'images/revenue.png');
+            } else {
+                // Reset text to 'Click here'
+                clickLabelWindow.setAttribute('value', 'Click here');
+                windowImage.setAttribute('src', 'images/windowImage.jpg');
+                clickLabelWindow.setAttribute('position', '-0.25 -1.25 0.2');
+              }
+            });
+          </script>
+
+        <!-- Class of 2022 Poster -->
+        <a-plane position="-7.8 2.5 0" rotation="0 90 0" width="3.8" height="2.8" color="white" src="images/classof2022Image.jpeg" id="classOf2022">
+            <a-text value="Click here" position="-0.25 1.5 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black"
+                id="clickLabelClassOf2022"></a-text>
+            </a-plane>
+
+            <script>
+                // Get the elements
+                const classOf2022 = document.getElementById('classOf2022');
+                const clickLabelClassOf2022 = document.getElementById('clickLabelClassOf2022');
+              
+                classOf2022.addEventListener('click', function() {
+                  // Get current value of text to determine what to toggle
+                  const currentText = clickLabelClassOf2022.getAttribute('value');
+                  
+                  if (currentText === 'Click here') {
+                    clickLabelClassOf2022.setAttribute('value', 'This bar chart displays the cohort graduation rates by school in APS, comparing multiple years. It highlights disparities in graduation outcomes, with some schools, such as CSK and North Atlanta, achieving near-perfect rates, while others, like Douglass and Mays, fall significantly below state averages. This data specifically reveals which schools may need targeted resources and interventions, such as improved counseling services, academic support programs, or community engagement initiatives, to support students in completing their education.');
+                    clickLabelClassOf2022.setAttribute('position', '2 -0.2 0.2');
+                    classOf2022.setAttribute('src', 'images/SeniorsGraph.png');
+                } else {
+                    // Reset text to 'Click here'
+                    clickLabelClassOf2022.setAttribute('value', 'Click here');
+                    clickLabelClassOf2022.setAttribute('position', '-0.25 1.5 0.2');
+                    classOf2022.setAttribute('src', 'images/classof2022Image.jpeg');
+                  }
+                });
+              </script>
+
+        <!-- whiteboard -->
+        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white" src="images/whiteboard.png" id="whiteBoard">
+            <a-text value="Click here" position="-0.25 0 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black" id="clickLabelWhiteboard"></a-text>
+        </a-plane>
+
+        <script>
+            // Get the elements
+            const whiteBoard = document.getElementById('whiteBoard');
+            const clickLabelWhiteboard = document.getElementById('clickLabelWhiteboard');
+          
+            whiteBoard.addEventListener('click', function() {
+              // Get current value of text to determine what to toggle
+              const currentText = clickLabelWhiteboard.getAttribute('value');
+              
+              if (currentText === 'Click here') {
+                clickLabelWhiteboard.setAttribute('value', 'This chart showcases how Atlanta Public Schools allocate their funds, with most spending directed toward instruction ($551.2 million), followed by support services ($375.2 million), and a smaller portion for other expenses ($17.0 million). While the emphasis on instruction is clear, disparities in resource distribution could mean that some schools lack access to critical technology or support staff, impacting student outcomes.');
+                clickLabelWhiteboard.setAttribute('position', '-1.5 -2.05 0.2');
+                whiteBoard.setAttribute('src', 'images/funding.png');
+            } else {
+                // Reset text to 'Click here'
+                clickLabelWhiteboard.setAttribute('value', 'Click here');
+                clickLabelWhiteboard.setAttribute('position', '-0.25 0 0.2');
+                whiteBoard.setAttribute('src', 'images/whiteboard.png');
+              }
+            });
+          </script>
+
+        <!-- Camera with wasd-controls -->
+        <a-entity id='camera' camera look-controls wasd-controls="acceleration: 50" position="4 2 -5" rotation='0 -90 0'
+            timer>
+            <a-cursor></a-cursor>
+        </a-entity>
+
+        <!-- Clock -->
+        <a-entity position="6 4 -4.4" rotation="0 0 90">
+            <!-- Hour Hand -->
+            <a-box position="0.2 1.5 -3.3" width="0.05" height="0.6" depth="0.05" rotation="0 0 75"
+                color="black"></a-box>
+
+            <!-- Minute Hand -->
+            <a-box position="0 1.7 -3.3" width="0.05" height="0.6" depth="0.03" rotation="0 0 180"
+                color="black"></a-box>
+
+            <!-- Clock Base -->
+            <a-cylinder position="0 1.5 -3.5" radius="0.8" height="0.1" color="black" rotation="0 90 90"></a-cylinder>
+            <a-cylinder position="0 1.5 -3.4" radius="0.6" height="0.1" color="white" rotation="0 90 90"></a-cylinder>
+        </a-entity>
+
+        <!-- Lamp -->
+        <a-entity id="lamp-light" lamp-light>
+            
+            <!-- Lamp Stand -->
+            <a-cylinder position="-6 1 7" radius="0.1" height="1.9" color="gray"></a-cylinder>
+
+            <!-- Lamp Shade -->
+            <a-cone position="-6 2 7" radius-bottom="0.5" radius-top="0" height="1" color="white"></a-cone>
+
+            <!-- Light Source (Sphere) -->
+            <a-sphere id="light-source" position="-6 2.5 7" radius="0.2" color="blue"
+                light="type: point; intensity: 0.9; color: blue"></a-sphere>
+        </a-entity>
+
+        <!-- Drawers for dresser -->
+        <a-box position="7.5 0.75 6.5" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 0.35 6.5" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 -0.05 6.5" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+
+        <a-box position="7.5 0.75 4.75" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 0.35 4.75" rotation="0 90 0" width="1.75" height="0.6" depth="0.6" color="#8B4513"></a-box>
+        <a-box position="7.5 -0.05 4.75" rotation="0 90 0" width="1.75" height="0.6" depth="0.6"
+            color="#8B4513"></a-box>
+
+        <!-- Handles for dresser -->
+        <a-cylinder position="7.28 0.90 6.5" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.55 6.5" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.20 6.5" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+
+        <a-cylinder position="7.28 0.90 4.75" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.55 4.75" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+        <a-cylinder position="7.28 0.20 4.75" rotation="90 90 0" radius="0.04" height="0.2"
+            color="#FFED8A"></a-cylinder>
+
+<!-- Teacher Desk and Chair Entity -->
+<a-entity id="teacher-desk-and-chair" position="-6.5 0 -14" rotation="0 90 0">
+    <!-- Desk Top -->
+    <a-box position="-7.5 1 0" rotation="0 90 0" width="3" height="0.1" depth="1" color="#8B4513"></a-box>
+
+    <!-- Dollar Bill 1 -->
+    <!-- Adjusted a-text to match the plane's direction -->
+<a-plane position="-7.5 1.12 1" rotation="-90 -20 0" width="0.7" height="0.3" color="green" src="images/dollarBill.jpeg" id="dollarBill1">
+    <a-text value="Click the dollar bill" position="0 1 0.5" rotation="30 -90 -90" scale="0.5 0.5 0.5" color="black" id="clickLabelDollar1" visible="true"></a-text>
+</a-plane>
+
+  
+    <!-- Dollar Bill 2 -->
+    <a-plane position="-7.5 1.1 1" color="green" rotation="-90 0 0" width="0.7" height="0.3" src="images/dollarBill.jpeg">
+    </a-plane>
+
+  
+    <!-- Desk Legs -->
+    <a-box position="-7.88 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.2" color="#8B4513"></a-box>
+    <a-box position="-7.05 0.5 1.4" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+  
+    <!-- Drawers for Desk -->
+    <a-box position="-7.5 0.5 -1.13" rotation="0 90 0" width=".75" height="1" depth="1" color="#8B4513"></a-box>
+  
+    <!-- Handles for Desk Drawers -->
+    <a-cylinder position="-7.08 0.90 -1.13" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+    <a-cylinder position="-7.08 0.55 -1.13" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+    <a-cylinder position="-7.08 0.20 -1.13" rotation="90 90 0" radius="0.04" height="0.2" color="#FFED8A"></a-cylinder>
+  
+    <!-- Chair Seat -->
+    <a-box position="-7 0.5 0.25" rotation="0 90 0" width=".6" height="0.1" depth=".6" color="#6495ED"></a-box>
+  
+    <!-- Chair Back -->
+    <a-box position="-6.72 0.9 0.25" rotation="0 90 0" width=".6" height=".8" depth="0.05" color="#6495ED"></a-box>
+  
+    <!-- Chair Legs -->
+    <a-box position="-7.25 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+    <a-box position="-7.25 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+    <a-box position="-6.73 0.25 0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+    <a-box position="-6.73 0.25 0" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+  </a-entity>
+
+  <script>
+    // Get the elements
+    const dollarBill1 = document.getElementById('dollarBill1');
+    const clickLabelDollar1 = document.getElementById('clickLabelDollar1');
+  
+    // Add click event listener to dollar bill
+    dollarBill1.addEventListener('click', function() {
+      // Get the current src of the dollar bill to determine what to toggle
+      const currentSrc = dollarBill1.getAttribute('src');
+      
+      if (currentSrc === 'images/dollarBill.jpeg') {
+        // Change the dollar bill image and properties
+        dollarBill1.setAttribute('src', 'images/teacherSalary.png');
+        dollarBill1.setAttribute('width', '1.5');
+        dollarBill1.setAttribute('height', '1.5');
+        dollarBill1.setAttribute('rotation', '0 -90 360'); // Rotate the dollar bill
+        dollarBill1.setAttribute('position', '-6.5 2 0'); // Position adjusted for the new size
+        clickLabelDollar1.setAttribute('rotation', ' 0 0');
+        clickLabelDollar1.setAttribute('position', '-0.75 1.5 0');
+  
+        clickLabelDollar1.setAttribute('value', 'The bar chart illustrates the distribution of teacher salaries in APS. The average salary is $43,171/year ($21/hour), but significant variation exists. Schools with higher salaries may attract more experienced teachers, correlating with better student outcomes, while schools with lower salaries could face challenges in retaining quality educators. Addressing these disparities could directly impact academic achievement. Click the Graph to return.');
+        dollarBill1.setAttribute('color', 'white');
+      } else {
+        // Reset the dollar bill properties
+        dollarBill1.setAttribute('src', 'images/dollarBill.jpeg');
+        dollarBill1.setAttribute('width', '0.7');
+        dollarBill1.setAttribute('height', '0.3');
+        dollarBill1.setAttribute('rotation', '-90 -20 0');
+        dollarBill1.setAttribute('position', '-7.5 1.12 1'); // Reset position of the dollar bill
+        dollarBill1.setAttribute('color', 'green');
+
+        clickLabelDollar1.setAttribute('value', 'Click the dollar bill');
+        clickLabelDollar1.setAttribute('position', '0 1 0.5');
+        clickLabelDollar1.setAttribute('rotation', '30 -90 -90');
+  
+      }
+    }); 
+  </script>
+  
+  
+
+        <!-- <a-scene> -->
+            <!-- Parent entity for desks and chairs -->
+            <a-entity id="desks-and-chairs" position="-4 0 -4">
+              <!-- Template for desk and chair -->
+              <a-entity position="0 0 0" repeat="count: 6; x: 3; z: -3">
+                <!-- Desk Top -->
+                <a-box position="0 1 0" rotation="0 0 0" width="2" height="0.1" depth="1" color="#8B4513"></a-box>
+          
+                <!-- Desk Legs -->
+                <a-box position="0.9 0.5 0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+                <a-box position="-0.9 0.5 0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+                <a-box position="0.9 0.5 -0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+                <a-box position="-0.9 0.5 -0.35" rotation="0 90 0" width="0.2" height="1" depth="0.1" color="#8B4513"></a-box>
+          
+                <!-- Chair Seat -->
+                <a-box position="0 0.5 -0.75" rotation="0 90 0" width="0.6" height="0.1" depth="0.6" color="#6495ED"></a-box>
+          
+                <!-- Chair Back -->
+                <a-box position="0 0.9 -1.05" rotation="0 0 0" width="0.6" height="0.8" depth="0.05" color="#6495ED"></a-box>
+          
+                <!-- Chair Legs -->
+                <a-box position="0.25 0.25 -0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+                <a-box position="0.25 0.25 -1" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+                <a-box position="-0.25 0.25 -0.5" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+                <a-box position="-0.25 0.25 -1" rotation="0 90 0" width="0.05" height="0.5" depth="0.05" color="#8B4513"></a-box>
+              </a-entity>
+            </a-entity>
+          <!-- </a-scene> -->
+
+        <!-- test on a desk to show ACT score data -->
+
+        <a-plane position="0 1.1 -0.98" rotation="-90 0 180" width="0.8" height="0.8"  src="images/test3705.png" id="testPlane">
+            <a-text value="Click the test" position="-0.2 0 0.2" rotation="90 0 0" scale="0.5 0.5 0.5" color="black"
+                id="clickLabelACT"></a-text> </a-plane>
+
+                <script>
+                    // Get the elements
+                    const testPlane = document.getElementById('testPlane');
+                    const clickLabelACT = document.getElementById('clickLabelACT');
+                  
+                    // Add click event listener to the test plane
+                    testPlane.addEventListener('click', function () {
+                      // Get current value of the text
+                      const currentText = clickLabelACT.getAttribute('value');
+                  
+                      if (currentText === 'Click the test') {
+                        // Change text to detailed information
+                        clickLabelACT.setAttribute(
+                          'value',
+                          'This bar chart illustrates the average ACT composite scores by APS high schools, highlighting disparities in academic achievement across the district. Schools like Midtown and Classical achieve the highest scores, likely reflecting better resource allocation, access to preparatory programs, and teacher quality. Conversely, schools like Carver and Douglass fall behind, indicating areas where additional instructional resources or test preparation support may be needed.');
+
+                        clickLabelACT.setAttribute('rotation', '0 0 0');
+                        clickLabelACT.setAttribute('position', '-3.25 0 0');
+                        testPlane.setAttribute('src', 'images/ACTScores.png');
+                        testPlane.setAttribute('width', '1.5');
+                        testPlane.setAttribute('height', '1.5');
+                        testPlane.setAttribute('rotation', '0 180 0');
+                        testPlane.setAttribute('position', '-1 2 0');
+                      } else {
+                        // Reset text to the original prompt
+                        clickLabelACT.setAttribute('value', 'Click the test');
+                        clickLabelACT.setAttribute('position', '-0.2 0 0.2');
+                        clickLabelACT.setAttribute('rotation', '90 0 0');
+                        testPlane.setAttribute('src', 'images/test3705.png');
+                        testPlane.setAttribute('width', '0.8');
+                        testPlane.setAttribute('height', '0.8');
+                        testPlane.setAttribute('rotation', '-90 0 180');
+                        testPlane.setAttribute('position', '0 1.1 -0.98');
+                      }
+                    });
+                  </script>
+
+          <script>
+            // Number of desks and spacing
+            const numRows = 4; // Number of rows
+            const numCols = 3; // Number of columns
+            const xSpacing = 4; // Spacing between desks in the x-axis
+            const zSpacing = 3; // Spacing between desks in the z-axis
+          
+            // Reference to the parent entity
+            const parentEntity = document.getElementById("desks-and-chairs");
+          
+            for (let row = 0; row < numRows; row++) {
+              for (let col = 0; col < numCols; col++) {
+                // Create a parent entity for each desk and chair
+                const deskChairEntity = document.createElement("a-entity");
+          
+                // Position the desk and chair
+                const xPos = col * xSpacing;
+                const zPos = row * zSpacing;
+                deskChairEntity.setAttribute("position", `${xPos} 0 ${zPos}`);
+          
+                // Add the desk top
+                const deskTop = document.createElement("a-box");
+                deskTop.setAttribute("position", "0 1 0");
+                deskTop.setAttribute("width", "2");
+                deskTop.setAttribute("height", "0.1");
+                deskTop.setAttribute("depth", "1");
+                deskTop.setAttribute("color", "#8B4513");
+                deskChairEntity.appendChild(deskTop);
+          
+                // Add desk legs
+                const legPositions = [
+                  "0.9 0.5 0.35",
+                  "-0.9 0.5 0.35",
+                  "0.9 0.5 -0.35",
+                  "-0.9 0.5 -0.35",
+                ];
+                legPositions.forEach((pos) => {
+                  const leg = document.createElement("a-box");
+                  leg.setAttribute("position", pos);
+                  leg.setAttribute("width", "0.2");
+                  leg.setAttribute("height", "1");
+                  leg.setAttribute("depth", "0.1");
+                  leg.setAttribute("color", "#8B4513");
+                  deskChairEntity.appendChild(leg);
+                });
+          
+                // Add chair seat
+                const chairSeat = document.createElement("a-box");
+                chairSeat.setAttribute("position", "0 0.5 -0.75");
+                chairSeat.setAttribute("width", "0.6");
+                chairSeat.setAttribute("height", "0.1");
+                chairSeat.setAttribute("depth", "0.6");
+                chairSeat.setAttribute("color", "#6495ED");
+                deskChairEntity.appendChild(chairSeat);
+          
+                // Add chair back
+                const chairBack = document.createElement("a-box");
+                chairBack.setAttribute("position", "0 0.9 -1.05");
+                chairBack.setAttribute("width", "0.6");
+                chairBack.setAttribute("height", "0.8");
+                chairBack.setAttribute("depth", "0.05");
+                chairBack.setAttribute("color", "#6495ED");
+                deskChairEntity.appendChild(chairBack);
+          
+                // Add chair legs
+                const chairLegPositions = [
+                  "0.25 0.25 -0.5",
+                  "0.25 0.25 -1",
+                  "-0.25 0.25 -0.5",
+                  "-0.25 0.25 -1",
+                ];
+                chairLegPositions.forEach((pos) => {
+                  const leg = document.createElement("a-box");
+                  leg.setAttribute("position", pos);
+                  leg.setAttribute("width", "0.05");
+                  leg.setAttribute("height", "0.5");
+                  leg.setAttribute("depth", "0.05");
+                  leg.setAttribute("color", "#8B4513");
+                  deskChairEntity.appendChild(leg);
+                });
+          
+                // Append the desk and chair entity to the parent
+                parentEntity.appendChild(deskChairEntity);
+              }
+            }
+          </script>
+
+        <!-- Bookshelf -->
+        <a-entity id="bookshelf" bookshelf>
+            <!-- <a-text value="Click here" position="0 1.5 0" rotation="0 0 0" scale="2 2 2" color="black" id="clickLabelWBookshelf"></a-text> -->
+             <!-- Back panel of the bookshelf (mirrored) -->
+             <a-plane position="-4 0.3 -7.8" rotation="0 0 0" width="2" height="5" color="#8B4513"></a-plane>
+        
+             <!-- Left side of the bookshelf -->
+             <a-box position="-4.75 0.3 -7.7" rotation="90 10 10" width="0.3" height="0.5" depth="5" color="#8B4513"></a-box>
+         
+             <!-- Right side of the bookshelf -->
+             <a-box position="-3.15 0.3 -7.7" rotation="90 0 10" width="0.3" height="0.5" depth="5" color="#8B4513"></a-box>
+         
+             <!-- Top of the bookshelf -->
+             <a-box position="-4 2.74 -7.7" rotation="0 90 0" width="0.5" height="0.1" depth="1.4" color="#8B4513"></a-box>
+         
+             <!-- First shelf of the bookshelf -->
+             <a-box position="-4 1.9 -7.7" rotation="0 90 0" width="0.5" height="0.1" depth="1.4" color="#8B4513"></a-box>
+         
+             <!-- Second shelf of the bookshelf -->
+             <a-box position="-4 1 -7.7" rotation="0 90 0" width="0.5" height="0.1" depth="1.3" color="#8B4513"></a-box>
+         
+             <!-- Bottom of bookshelf -->
+             <a-box position="-4 0.1 -7.7" rotation="0 90 0" width="0.5" height="0.2" depth="1.3" color="#8B4513"></a-box>
+            <!-- Game of Thrones Book -->
+            <a-image id="GOTBook" src="Books/gameOfThronesBook.jpeg" position="-4 1.3 -7.7" rotation="0 0 0" width="0.3"
+                height="0.5">
+
+                <a-entity event-set__click="key3Found: true"></a-entity>
+
+            </a-image>
+
+            <!-- Other Books -->
+            <a-box  src="Books/percyJackson.jpeg" position="-4.4 1.28 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/catchingFire.jpg" position="-4.4 0.44 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/normalPeople.jpeg" position="-4.4 1.28 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/weWereLiars.jpg" position="-3.6 0.44 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/1984.jpeg" position="-4.4 2.18 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/animalFarm.jpg" position="-3.6 1.28 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/shadowAndBone.jpg" position="-4 2.18 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/faultInOurStars.jpg" position="-4 0.44 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+            <a-box  src="Books/sixOfCrows.jpg" position="-3.6 2.18 -7.7" rotation="0 180 0" width="0.3" depth="0" height="0.45"></a-box>
+
+            <a-plane position="-4 1.3 -7.7" rotation="0 0 0" width=".3" height=".5" src="Keys/bookshelfKey.png"></a-plane>
+
+            <!-- Door -->
+            <a-box id="door" position="0 0.3 -7.99" rotation="0 0 0" scale="1.5 4.5 0.2" color="#6E260E">
+                </a-entity>
+            </a-box>
+            <a-sphere id="knob" position="-0.5 1.15 -7.9" color="yellow" radius="0.1"></a-sphere>
+
+        </a-entity>
+    </a-scene>
 </body>
 
 </html>
