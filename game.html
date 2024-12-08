@@ -85,22 +85,6 @@
             }
         });
 
-        // AFRAME.registerComponent('clickable', {
-        //     schema: {
-        //         keys: { type: 'array' }
-        //     },
-        //     init: function () {
-        //         this.el.addEventListener('click', () => this.checkKeys());
-        //     },
-        //     checkKeys: function () {
-        //         if (key1Found && key2Found && key3Found) {
-        //             window.location.href = 'congrats.html';
-        //         } else {
-        //             alert("You have not found all the keys yet!");
-        //         }
-        //     }
-        // });
-
     </script>
 </head>
 
@@ -108,7 +92,7 @@
 
     <a-scene background="color: white">
         <a-entity environment=""></a-entity>
-        <!-- <a-entity environment="preset: forest; dressingAmount: 100"></a-entity>-->
+        <!-- <a-entity environment="preset: forest; dressingAmount: 100"></a-entity> -->
 
         <!-- Floor -->
         <a-plane position="0 0.09 0" rotation="-90 0 0" width="16" height="16" repeat="4 2" color="#A36846"></a-plane>
@@ -124,7 +108,7 @@
         <a-plane position="0 6 0" rotation="90 0 0" width="16" height="16" repeat="4 2" color="#a1a1a1"></a-plane>
 
         <!-- Ambient Light -->
-        <a-light type="ambient" color="#888" intensity="0.8"></a-light>
+        <a-light type="ambient" color="#888" intensity="1.75"></a-light>
 
         <!-- Point Lights -->
         <a-light type="point" color="#888" intensity="0.25" position="7 5.8 7"></a-light>
@@ -147,10 +131,88 @@
 
         </a-entity>
 
+        <!-- Window Image -->
+        <a-plane position="7.5 2.5 1" rotation="0 -90 0" width="4" height="2" color="white" src="images/windowImage.jpg"
+            id="windowImage">
+            <a-text value="Click here" position="-0.25 -1.25 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black"
+                id="clickLabelWindow"></a-text>
+        </a-plane>
+
+        <script>
+            // Get the elements
+            const windowImage = document.getElementById('windowImage');
+            const clickLabelWindow = document.getElementById('clickLabelWindow');
+          
+            // Add click event listener to dollar bill
+            windowImage.addEventListener('click', function() {
+              // Get current value of text to determine what to toggle
+              const currentText = clickLabelWindow.getAttribute('value');
+              
+              if (currentText === 'Click here') {
+                // Change text to 'You clicked the dollar bill!'
+                clickLabelWindow.setAttribute('value', 'This bar chart displays the cohort graduation rates by school in APS, comparing multiple years. It highlights disparities in graduation outcomes, with some schools, such as CSK and North Atlanta, achieving near-perfect rates, while others, like Douglass and Mays, fall significantly below state averages. This data specifically reveals which schools may need targeted resources and interventions, such as improved counseling services, academic support programs, or community engagement initiatives, to support students in completing their education.');
+                clickLabelWindow.setAttribute('width', '4');
+            } else {
+                // Reset text to 'Click here'
+                clickLabelWindow.setAttribute('value', 'Click here');
+              }
+            });
+          </script>
+
+        <!-- Class of 2022 Poster -->
+        <a-plane position="-7.8 2.5 0" rotation="0 90 0" width="3.8" height="2.8" color="white" src="images/classof2022Image.jpeg" id="classOf2022">
+            <a-text value="Click here" position="-0.25 1.5 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black"
+                id="clickLabelClassOf2022"></a-text>
+            </a-plane>
+
+            <script>
+                // Get the elements
+                const classOf2022 = document.getElementById('classOf2022');
+                const clickLabelClassOf2022 = document.getElementById('clickLabelClassOf2022');
+              
+                // Add click event listener to dollar bill
+                classOf2022.addEventListener('click', function() {
+                  // Get current value of text to determine what to toggle
+                  const currentText = clickLabelClassOf2022.getAttribute('value');
+                  
+                  if (currentText === 'Click here') {
+                    // Change text to 'You clicked the dollar bill!'
+                    clickLabelClassOf2022.setAttribute('value', 'This bar chart displays the cohort graduation rates by school in APS, comparing multiple years. It highlights disparities in graduation outcomes, with some schools, such as CSK and North Atlanta, achieving near-perfect rates, while others, like Douglass and Mays, fall significantly below state averages. This data specifically reveals which schools may need targeted resources and interventions, such as improved counseling services, academic support programs, or community engagement initiatives, to support students in completing their education.');
+                    clickLabelClassOf2022.setAttribute('position', '-1.5 -0.5 0.2');
+                } else {
+                    // Reset text to 'Click here'
+                    clickLabelClassOf2022.setAttribute('value', 'Click here');
+                    clickLabelClassOf2022.setAttribute('position', '-0.25 1.5 0.2');
+                  }
+                });
+              </script>
+
         <!-- whiteboard -->
-        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white">
+        <a-plane position="0 3.2 7.88" rotation="0 180 0" width="3.8" height="2.8" color="white" src="images/whiteboard.png" id="whiteBoard">
             <a-text value="Click here" position="-0.25 0 0.2" rotation="0 0 0" scale="0.5 0.5 0.5" color="black" id="clickLabelWhiteboard"></a-text>
         </a-plane>
+
+        <script>
+            // Get the elements
+            const whiteBoard = document.getElementById('whiteBoard');
+            const clickLabelWhiteboard = document.getElementById('clickLabelWhiteboard');
+          
+            // Add click event listener to dollar bill
+            whiteBoard.addEventListener('click', function() {
+              // Get current value of text to determine what to toggle
+              const currentText = clickLabelWhiteboard.getAttribute('value');
+              
+              if (currentText === 'Click here') {
+                // Change text to 'You clicked the dollar bill!'
+                clickLabelWhiteboard.setAttribute('value', 'This chart showcases how Atlanta Public Schools allocate their funds, with most spending directed toward instruction ($551.2 million), followed by support services ($375.2 million), and a smaller portion for other expenses ($17.0 million). While the emphasis on instruction is clear, disparities in resource distribution could mean that some schools lack access to critical technology or support staff, impacting student outcomes.');
+                clickLabelWhiteboard.setAttribute('position', '-1.5 -0.5 0.2');
+            } else {
+                // Reset text to 'Click here'
+                clickLabelWhiteboard.setAttribute('value', 'Click here');
+                clickLabelWhiteboard.setAttribute('position', '-0.25 0 0.2');
+              }
+            });
+          </script>
 
         <!-- Camera with wasd-controls -->
         <a-entity id='camera' camera look-controls wasd-controls="acceleration: 50" position="4 2 -5" rotation='0 -90 0'
@@ -215,14 +277,14 @@
     <a-box position="-7.5 1 0" rotation="0 90 0" width="3" height="0.1" depth="1" color="#8B4513"></a-box>
 
     <!-- Dollar Bill 1 -->
-    <a-plane position="-7.5 1.12 1" rotation="-90 -20 0" width="0.7" height="0.3" color="green" src="images/dollarBill.jpeg" id="dollarBill1">
-        <a-text value="Click here" position="-0.25 0 0.2" rotation="90 0 0" scale="0.5 0.5 0.5" color="#FFFFFF" id="clickLabelDollar1" visible="true"></a-text>
-        <!-- Text to be changed after click -->
-        <!-- <a-text id="showText" value="You clicked the dollar bill!" position="-0.25 0 0.2" rotation="90 0 0" scale="1 1 1" color="black" visible="false"></a-text> -->
-    </a-plane>
+    <!-- Adjusted a-text to match the plane's direction -->
+<a-plane position="-7.5 1.12 1" rotation="-90 -20 0" width="0.7" height="0.3"  src="images/dollarBill.jpeg" id="dollarBill1">
+    <a-text value="Click the dollar bill" position="0 1 0.5" rotation="30 -90 -90" scale="0.5 0.5 0.5" color="black" id="clickLabelDollar1" visible="true"></a-text>
+</a-plane>
+
   
     <!-- Dollar Bill 2 -->
-    <a-plane position="-7.5 1.1 1" rotation="-90 0 0" width="0.7" height="0.3" color="green" src="images/dollarBill.jpeg">
+    <a-plane position="-7.5 1.1 1" rotation="-90 0 0" width="0.7" height="0.3" src="images/dollarBill.jpeg">
     </a-plane>
 
   
@@ -261,16 +323,15 @@
       // Get current value of text to determine what to toggle
       const currentText = clickLabelDollar1.getAttribute('value');
       
-      if (currentText === 'Click here') {
+      if (currentText === 'Click the dollar bill') {
         // Change text to 'You clicked the dollar bill!'
-        clickLabelDollar1.setAttribute('value', 'You clicked the dollar bill!');
+        clickLabelDollar1.setAttribute('value', 'The bar chart illustrates the distribution of teacher salaries in APS. The average salary is $43,171/year ($21/hour), but significant variation exists. Schools with higher salaries may attract more experienced teachers, correlating with better student outcomes, while schools with lower salaries could face challenges in retaining quality educators. Addressing these disparities could directly impact academic achievement.');
       } else {
         // Reset text to 'Click here'
-        clickLabelDollar1.setAttribute('value', 'Click here');
+        clickLabelDollar1.setAttribute('value', 'Click the dollar bill');
       }
     });
   </script>
-  
 
         <!-- <a-scene> -->
             <!-- Parent entity for desks and chairs -->
@@ -300,6 +361,37 @@
               </a-entity>
             </a-entity>
           <!-- </a-scene> -->
+
+        <!-- test on a desk to show ACT score data -->
+
+        <a-plane position="0 1.1 -0.98" rotation="-90 0 180" width="0.8" height="0.8"  src="images/test3705.png" id="testPlane">
+            <a-text value="Click the test" position="-0.2 0 0.2" rotation="90 0 0" scale="0.5 0.5 0.5" color="black"
+                id="clickLabelACT"></a-text> </a-plane>
+
+                <script>
+                    // Get the elements
+                    const testPlane = document.getElementById('testPlane');
+                    const clickLabelACT = document.getElementById('clickLabelACT');
+                  
+                    // Add click event listener to the test plane
+                    testPlane.addEventListener('click', function () {
+                      // Get current value of the text
+                      const currentText = clickLabelACT.getAttribute('value');
+                  
+                      if (currentText === 'Click the test') {
+                        // Change text to detailed information
+                        clickLabelACT.setAttribute(
+                          'value',
+                          'This bar chart illustrates the average ACT composite scores by APS high schools, highlighting disparities in academic achievement across the district. Schools like Midtown and Classical achieve the highest scores, likely reflecting better resource allocation, access to preparatory programs, and teacher quality. Conversely, schools like Carver and Douglass fall behind, indicating areas where additional instructional resources or test preparation support may be needed.');
+
+                        clickLabelACT.setAttribute('position', '-0.8 0 0.8');
+                      } else {
+                        // Reset text to the original prompt
+                        clickLabelACT.setAttribute('value', 'Click the test');
+                        clickLabelACT.setAttribute('position', '-0.2 0 0.2');
+                      }
+                    });
+                  </script>
 
           <script>
             // Number of desks and spacing
@@ -390,7 +482,7 @@
 
         <!-- Bookshelf -->
         <a-entity id="bookshelf" bookshelf>
-            <a-text value="Click here" position="0 1.5 0" rotation="0 0 0" scale="2 2 2" color="black" id="clickLabelWBookshelf"></a-text>
+            <!-- <a-text value="Click here" position="0 1.5 0" rotation="0 0 0" scale="2 2 2" color="black" id="clickLabelWBookshelf"></a-text> -->
              <!-- Back panel of the bookshelf (mirrored) -->
              <a-plane position="-4 0.3 -7.8" rotation="0 0 0" width="2" height="5" color="#8B4513"></a-plane>
         
